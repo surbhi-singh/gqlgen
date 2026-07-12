@@ -78,6 +78,12 @@ func (v *Value) Value(vars map[string]any) (any, error) {
 	case ObjectValue:
 		val := map[string]any{}
 		for _, elem := range v.Children {
+			if elem.Value.Kind == Variable {
+				if _, ok := vars[elem.Value.Raw]; !ok &&
+					(elem.Value.VariableDefinition == nil || elem.Value.VariableDefinition.DefaultValue == nil) {
+					continue
+				}
+			}
 			elemVal, err := elem.Value.Value(vars)
 			if err != nil {
 				return val, err
